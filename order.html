@@ -1,7 +1,10 @@
+<!DOCTYPE html>
+<html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Главная — Bootstrap Shop</title>
+    <title>Заявка — SoaD Vinyl</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/custom.css">
 </head>
@@ -9,7 +12,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="index.html">Bootstrap Shop</a>
+            <a class="navbar-brand" href="index.html">SoaD Vinyl</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
                 aria-controls="mainNavbar" aria-expanded="false" aria-label="Переключить навигацию">
@@ -27,11 +30,11 @@
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="product.html">Товар</a>
+                        <a class="nav-link" href="product.html">Пластинка</a>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" href="order.html">Заявка</a>
+                        <a class="nav-link active" aria-current="page" href="order.html">Заявка</a>
                     </li>
 
                     <li class="nav-item dropdown">
@@ -40,7 +43,7 @@
                             Дополнительно
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="catalog.html">Все товары</a></li>
+                            <li><a class="dropdown-item" href="catalog.html">Все пластинки</a></li>
                             <li><a class="dropdown-item" href="order.html">Оформить заявку</a></li>
                             <li><a class="dropdown-item" href="index.html#popular">Популярное</a></li>
                         </ul>
@@ -49,12 +52,13 @@
             </div>
         </div>
     </nav>
+
     <main class="container my-5">
         <div class="row justify-content-center">
             <div class="col-12 col-lg-8">
                 <div class="card shadow-sm">
                     <div class="card-header bg-primary text-white">
-                        <h1 class="h4 mb-0">Форма заявки</h1>
+                        <h1 class="h4 mb-0">Заявка на винил</h1>
                     </div>
 
                     <div class="card-body">
@@ -62,16 +66,23 @@
                             Заполните форму. Поля со звёздочкой являются обязательными.
                         </div>
 
-                        <form>
+                        <form id="vinylOrderForm">
                             <div class="row g-3">
+                                <!-- form-floating — компонент, которого не было в практиках -->
                                 <div class="col-12 col-md-6">
-                                    <label for="order-name" class="form-label">Имя *</label>
-                                    <input id="order-name" name="name" type="text" class="form-control" required>
+                                    <div class="form-floating">
+                                        <input id="order-name" name="name" type="text" class="form-control"
+                                            placeholder="Иван" required>
+                                        <label for="order-name">Имя *</label>
+                                    </div>
                                 </div>
 
                                 <div class="col-12 col-md-6">
-                                    <label for="order-email" class="form-label">E-mail *</label>
-                                    <input id="order-email" name="email" type="email" class="form-control" required>
+                                    <div class="form-floating">
+                                        <input id="order-email" name="email" type="email" class="form-control"
+                                            placeholder="name@example.com" required>
+                                        <label for="order-email">E-mail *</label>
+                                    </div>
                                 </div>
 
                                 <div class="col-12 col-md-6">
@@ -84,12 +95,13 @@
                                 </div>
 
                                 <div class="col-12 col-md-6">
-                                    <label for="order-product" class="form-label">Товар</label>
+                                    <label for="order-product" class="form-label">Пластинка</label>
                                     <select id="order-product" name="product" class="form-select">
-                                        <option selected>Выберите товар</option>
-                                        <option value="product-1">Товар 1</option>
-                                        <option value="product-2">Товар 2</option>
-                                        <option value="product-3">Товар 3</option>
+                                        <option selected>Выберите пластинку</option>
+                                        <option value="toxicity">Toxicity (2LP)</option>
+                                        <option value="mezmerize">Mezmerize (1LP)</option>
+                                        <option value="hypnotize">Hypnotize (1LP)</option>
+                                        <option value="steal">Steal This Album! (2LP)</option>
                                     </select>
                                 </div>
 
@@ -108,13 +120,18 @@
                                     </div>
                                 </div>
 
-                                <div class="col-12 d-flex gap-2">
-                                    <button class="btn btn-primary" type="submit">
+                                <div class="col-12 d-flex gap-2 align-items-center">
+                                    <button class="btn btn-primary" type="submit" id="submitBtn">
                                         Отправить заявку
                                     </button>
                                     <button class="btn btn-outline-secondary" type="reset">
                                         Очистить
                                     </button>
+
+                                    <!-- spinner-border — компонент, которого не было в практиках -->
+                                    <div class="spinner-border text-primary d-none" id="orderSpinner" role="status">
+                                        <span class="visually-hidden">Загрузка…</span>
+                                    </div>
                                 </div>
                             </div>
                         </form>
@@ -123,6 +140,24 @@
             </div>
         </div>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Демонстрация spinner-border: при отправке формы кнопка блокируется,
+        // показывается спиннер на 1.5 секунды.
+        document.getElementById('vinylOrderForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            var btn = document.getElementById('submitBtn');
+            var spinner = document.getElementById('orderSpinner');
+            btn.disabled = true;
+            spinner.classList.remove('d-none');
+            setTimeout(function () {
+                spinner.classList.add('d-none');
+                btn.disabled = false;
+                alert('Заявка отправлена! (демонстрация)');
+            }, 1500);
+        });
     </script>
 </body>
+
+</html>
